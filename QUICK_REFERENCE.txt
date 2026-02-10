@@ -1,0 +1,64 @@
+╔══════════════════════════════════════════════════════════════╗
+║          🔐 QUICK REFERENCE - AKUN LOGIN EDUATTEND          ║
+╚══════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────┐
+│ 👨‍🏫 AKUN GURU                                                 │
+├──────────────────────────────────────────────────────────────┤
+│ Email    : guru1@sekolah.com                                 │
+│ Password : guru123                                           │
+│ Akses    : GuruView Dashboard                                │
+├──────────────────────────────────────────────────────────────┤
+│ Email    : guru2@sekolah.com                                 │
+│ Password : guru123                                           │
+│ Akses    : GuruView Dashboard                                │
+└──────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────┐
+│ 👨‍🎓 AKUN MURID                                                │
+├──────────────────────────────────────────────────────────────┤
+│ Email    : murid1@sekolah.com                                │
+│ Password : murid123                                          │
+│ Akses    : MuridView Dashboard                               │
+├──────────────────────────────────────────────────────────────┤
+│ Email    : murid2@sekolah.com                                │
+│ Password : murid123                                          │
+│ Akses    : MuridView Dashboard                               │
+├──────────────────────────────────────────────────────────────┤
+│ NIS      : 12345678                                          │
+│ Password : siswa123                                          │
+│ Akses    : MuridView Dashboard                               │
+├──────────────────────────────────────────────────────────────┤
+│ NIS      : 12345679                                          │
+│ Password : siswa123                                          │
+│ Akses    : MuridView Dashboard                               │
+└──────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────┐
+│ 🚀 CARA PAKAI                                                │
+├──────────────────────────────────────────────────────────────┤
+│ 1. Buka aplikasi                                             │
+│ 2. Masukkan Email/NIS                                        │
+│ 3. Masukkan Password                                         │
+│ 4. Klik Login                                                │
+│ 5. Otomatis redirect ke dashboard sesuai role               │
+└──────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────┐
+│ 🔧 MODE TESTING                                              │
+├──────────────────────────────────────────────────────────────┤
+│ ONLINE  : Gunakan AuthService (default)                     │
+│ OFFLINE : Gunakan MockAuthService                           │
+│                                                              │
+│ Untuk switch ke offline mode:                               │
+│ 1. Buka lib/page/login.dart                                 │
+│ 2. Ganti import:                                            │
+│    auth_service.dart → mock_auth_service.dart               │
+│ 3. Ganti:                                                   │
+│    AuthService.login → MockAuthService.login                │
+└──────────────────────────────────────────────────────────────┘
+
+⚠️  HANYA UNTUK TESTING - JANGAN GUNAKAN DI PRODUCTION!
+
+📄 Dokumentasi lengkap: AKUN_LOGIN.md
+🔧 Mock Service: lib/service/mock_auth_service.dart

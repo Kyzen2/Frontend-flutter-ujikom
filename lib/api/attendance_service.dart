@@ -1,43 +1,169 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AttendanceService {
-  static const baseUrl = "http://192.168.0.129:8000/api";
-  final storage = const FlutterSecureStorage();
+  // Update this URL to match your Laravel backend
+  static const baseUrl = "https://faye-trimorphic-discretionarily.ngrok-free.dev/api";
 
+  /// Get authentication token from SharedPreferences
   Future<String?> _getToken() async {
-    return await storage.read(key: 'token');
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
   }
 
-  Future<Map<String, dynamic>> createSession() async {
-    final token = await _getToken();
+  /// Create attendance session (Guru generates QR)
+  /// 
+  /// Parameters:
+  /// - jadwalId: ID of the jadwal (schedule) for this session
+  /// 
+  /// Returns:
+  /// - Map with 'status' and 'token_qr' fields
+  /// 
+  /// Example response from Laravel:
+  /// ```json
+  /// {
+  ///   "status": "success",
+  ///   "token_qr": "a1b2c3d4e5f6..."
+  /// }
+  /// ```
+  Future<Map<String, dynamic>> createSession({int jadwalId = 1}) async {
+    try {
+      final token = await _getToken();
 
-    final res = await http.post(
-      Uri.parse("$baseUrl/attendance/session"),
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json"
-      },
-    );
+      final res = await http.post(
+        Uri.parse("$baseUrl/attendance/session"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "jadwal_id": jadwalId,
+        }),
+      );
 
-    return jsonDecode(res.body);
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return jsonDecode(res.body);
+      } else {
+        return {
+          'status': 'error',
+          'message': 'Failed to create session: ${res.statusCode}',
+        };
+      }
+    } catch (e) {
+      return {
+        'status': 'error',
+        'message': 'Network error: $e',
+      };
+    }
   }
 
-  Future<Map<String, dynamic>> scanQR(String qrCode) async {
-    final token = await _getToken();
+  /// Scan QR code for attendance (Murid scans QR)
+  /// 
+  /// Parameters:
+  /// - tokenQr: The QR code token scanned by student
+  /// - latitude: Optional GPS latitude
+  /// - longitude: Optional GPS longitude
+  /// 
+  /// Returns:
+  /// - Map with 'status' and 'message' fields
+  /// 
+  /// Example response from Laravel:
+  /// ```json
+  /// {
+  ///   "status": "success",
+  ///   "message": "Absen Berhasil"
+  /// }
+  /// ```
+  Future<Map<String, dynamic>> scanQR(
+    String tokenQr, {
+    double? latitude,
+    double? longitude,
+  }) async {
+    try {
+      final token = await _getToken();
 
-    final res = await http.post(
-      Uri.parse("$baseUrl/attendance/scan"),
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json"
-      },
-      body: {
-        "qr_code": qrCode
-      },
-    );
+      final body = {
+        "token_qr": tokenQr,
+      };
 
-    return jsonDecode(res.body);
+      // Add GPS coordinates if provided
+      if (latitude != null && longitude != null) {
+        body['lat_siswa'] = latitude.toString();
+        body['long_siswa'] = longitude.toString();
+      }
+
+      final res = await http.post(
+        Uri.parse("$baseUrl/attendance/scan"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+        body: body,
+      );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return jsonDecode(res.body);
+      } else {
+        final errorData = jsonDecode(res.body);
+        return {
+          'status': 'error',
+          'message': errorData['message'] ?? 'Failed to scan QR: ${res.statusCode}',
+        };
+      }
+    } catch (e) {
+      return {
+        'status': 'error',
+        'message': 'Network error: $e',
+      };
+    }
+  }
+
+  /// Get attendance history for current student
+  /// 
+  /// Returns:
+  /// - Map with 'status', 'summary', and 'data' fields
+  /// 
+  /// Example response from Laravel:
+  /// ```json
+  /// {
+  ///   "status": "success",
+  ///   "summary": {
+  ///     "total_hadir": 10,
+  ///     "total_izin": 2,
+  ///     "total_invalid": 0
+  ///   },
+  ///   "data": [...]
+  /// }
+  /// ```
+  Future<Map<String, dynamic>> getHistory() async {
+    try {
+      final token = await _getToken();
+
+      final res = await http.get(
+        Uri.parse("$baseUrl/attendance/history"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      );
+
+      if (res.statusCode == 200) {
+        return jsonDecode(res.body);
+      } else {
+        return {
+          'status': 'error',
+          'message': 'Failed to get history: ${res.statusCode}',
+          'data': [],
+        };
+      }
+    } catch (e) {
+      return {
+        'status': 'error',
+        'message': 'Network error: $e',
+        'data': [],
+      };
+    }
   }
 }
