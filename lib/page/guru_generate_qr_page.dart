@@ -3,7 +3,8 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:ujikomaplikasi/api/attendance_service.dart';
 
 class GenerateQrGuruPage extends StatefulWidget {
-  const GenerateQrGuruPage({super.key});
+  final int jadwalId;
+  const GenerateQrGuruPage({super.key, required this.jadwalId});
 
   @override
   State<GenerateQrGuruPage> createState() => _GenerateQrGuruPageState();
@@ -28,7 +29,7 @@ class _GenerateQrGuruPageState extends State<GenerateQrGuruPage> {
     });
 
     try {
-      final res = await AttendanceService().createSession(jadwalId: 1);
+      final res = await AttendanceService().createSession(jadwalId: widget.jadwalId);
 
       if (!mounted) return;
 

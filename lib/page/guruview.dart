@@ -183,7 +183,7 @@ class GuruDashboardHome extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => const GenerateQrGuruPage(),
+            builder: (_) => const GenerateQrGuruPage(jadwalId: 1),
             ),
           );
         },

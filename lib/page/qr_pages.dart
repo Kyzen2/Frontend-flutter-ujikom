@@ -1,31 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:ujikomaplikasi/api/attendance_service.dart';
 
-class ScanQrPageMockup extends StatefulWidget {
-  const ScanQrPageMockup({super.key});
+class ScanQrPage extends StatefulWidget {
+  const ScanQrPage({super.key});
 
   @override
   State<ScanQrPage> createState() => _ScanQrPageState();
 }
 
 class _ScanQrPageState extends State<ScanQrPage> {
-  bool _isScanning = true;
+  final MobileScannerController _controller = MobileScannerController();
+  bool _isProcessing = false;
 
   @override
-  void initState() {
-    super.initState();
-    // Simulate scanning delay
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        _showSuccessDialog();
-      }
-    });
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
-  void _showSuccessDialog() {
+  Future<void> _handleQrScan(String qrToken) async {
+    if (_isProcessing) return;
+
     setState(() {
-      _isScanning = false;
+      _isProcessing = true;
     });
 
+    try {
+      final service = AttendanceService();
+      final result = await service.scanQR(qrToken);
+
+      if (!mounted) return;
+
+      if (result['status'] == 'success') {
+        _showSuccessDialog(result['message'] ?? 'Absensi Berhasil');
+      } else {
+        _showErrorDialog(result['message'] ?? 'Gagal melakukan absensi');
+      }
+    } catch (e) {
+      if (!mounted) return;
+      _showErrorDialog('Terjadi kesalahan: $e');
+    }
+  }
+
+  void _showSuccessDialog(String message) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -45,11 +63,13 @@ class _ScanQrPageState extends State<ScanQrPage> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildInfoRow('Mata Pelajaran', 'Matematika Wajib'),
-              const SizedBox(height: 8),
-              _buildInfoRow('Waktu', '08:05 WIB'),
-              const SizedBox(height: 8),
-              _buildInfoRow('Lokasi', 'Ruang 302'),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 14),
+              ),
+              const SizedBox(height: 16),
+              _buildInfoRow('Waktu', _formatTime(DateTime.now())),
               const SizedBox(height: 8),
               _buildInfoRow('Status', 'Hadir'),
             ],
@@ -77,6 +97,51 @@ class _ScanQrPageState extends State<ScanQrPage> {
     );
   }
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Column(
+            children: [
+              const Icon(Icons.error_outline, color: Colors.red, size: 60),
+              const SizedBox(height: 10),
+              const Text(
+                'Gagal Absensi',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          content: Text(
+            message,
+            textAlign: TextAlign.center,
+          ),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  setState(() {
+                    _isProcessing = false;
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text('Coba Lagi', style: TextStyle(color: Colors.white)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildInfoRow(String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -85,6 +150,10 @@ class _ScanQrPageState extends State<ScanQrPage> {
         Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
       ],
     );
+  }
+
+  String _formatTime(DateTime dt) {
+    return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')} WIB';
   }
 
   @override
@@ -99,52 +168,48 @@ class _ScanQrPageState extends State<ScanQrPage> {
       ),
       body: Stack(
         children: [
+          MobileScanner(
+            controller: _controller,
+            onDetect: (BarcodeCapture capture) {
+              final List<Barcode> barcodes = capture.barcodes;
+              for (final barcode in barcodes) {
+                if (barcode.rawValue != null && !_isProcessing) {
+                  _handleQrScan(barcode.rawValue!);
+                  break;
+                }
+              }
+            },
+          ),
+          // Scanning frame overlay
           Center(
             child: Container(
               width: 300,
               height: 300,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: Colors.white, width: 3),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Center(
+            ),
+          ),
+          // Instructions
+          Positioned(
+            bottom: 100,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: Text(
-                  'Arahkan kamera ke QR Code',
-                  style: TextStyle(color: Colors.white70),
+                  _isProcessing ? 'Memproses...' : 'Arahkan kamera ke QR Code',
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
             ),
           ),
-          if (_isScanning)
-            Positioned(
-              bottom: 100,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Text('Scanning...', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );

@@ -2,7 +2,7 @@
 
 ## Base URL
 ```
-http://192.168.0.129:8000/api
+https://faye-trimorphic-discretionarily.ngrok-free.dev/api
 ```
 
 > **Note**: Update this URL in `lib/api/attendance_service.dart` if your backend is hosted elsewhere.

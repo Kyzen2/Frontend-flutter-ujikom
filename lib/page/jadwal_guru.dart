@@ -25,6 +25,7 @@ class JadwalGuruPage extends StatelessWidget {
           children: [
             _buildDaySection(context, 'Hari Ini', [
               _buildScheduleData(
+                id: 1,
                 time: '08:00 AM',
                 className: 'X RPL 1',
                 subject: 'Web Programming',
@@ -32,6 +33,7 @@ class JadwalGuruPage extends StatelessWidget {
                 color: Colors.blue[50]!,
               ),
               _buildScheduleData(
+                id: 2,
                 time: '10:00 AM',
                 className: 'XI TKJ 2',
                 subject: 'Network Administration',
@@ -42,6 +44,7 @@ class JadwalGuruPage extends StatelessWidget {
             const SizedBox(height: 25),
             _buildDaySection(context, 'Besok', [
               _buildScheduleData(
+                id: 3,
                 time: '09:00 AM',
                 className: 'XII MM 1',
                 subject: 'Multimedia Design',
@@ -70,6 +73,7 @@ class JadwalGuruPage extends StatelessWidget {
         const SizedBox(height: 15),
         ...schedules.map((data) => _buildScheduleItem(
           context: context,
+          id: data['id'],
           time: data['time'],
           className: data['className'],
           subject: data['subject'],
@@ -81,6 +85,7 @@ class JadwalGuruPage extends StatelessWidget {
   }
 
   Map<String, dynamic> _buildScheduleData({
+    required int id,
     required String time,
     required String className,
     required String subject,
@@ -88,6 +93,7 @@ class JadwalGuruPage extends StatelessWidget {
     required Color color,
   }) {
     return {
+      'id': id,
       'time': time,
       'className': className,
       'subject': subject,
@@ -98,6 +104,7 @@ class JadwalGuruPage extends StatelessWidget {
 
   Widget _buildScheduleItem({
     required BuildContext context,
+    required int id,
     required String time,
     required String className,
     required String subject,
@@ -123,7 +130,7 @@ class JadwalGuruPage extends StatelessWidget {
            Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const GenerateQrGuruPage(),
+              builder: (context) => GenerateQrGuruPage(jadwalId: id),
             ),
           );
         },

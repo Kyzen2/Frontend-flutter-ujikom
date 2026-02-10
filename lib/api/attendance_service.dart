@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AttendanceService {
-  // Update this URL to match your Laravel backend
+  // Laravel backend via ngrok
   static const baseUrl = "https://faye-trimorphic-discretionarily.ngrok-free.dev/api";
 
   /// Get authentication token from SharedPreferences
@@ -46,9 +46,19 @@ class AttendanceService {
       if (res.statusCode == 200 || res.statusCode == 201) {
         return jsonDecode(res.body);
       } else {
+        String message = 'Failed to create session: ${res.statusCode}';
+        try {
+          final errorData = jsonDecode(res.body);
+          message = errorData['message'] ?? message;
+          // If there are validation errors, append them
+          if (errorData['errors'] != null) {
+            message += ": " + errorData['errors'].toString();
+          }
+        } catch (_) {}
+        
         return {
           'status': 'error',
-          'message': 'Failed to create session: ${res.statusCode}',
+          'message': message,
         };
       }
     } catch (e) {

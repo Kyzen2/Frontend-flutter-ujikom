@@ -48,6 +48,8 @@
 │ 🔧 MODE TESTING                                              │
 ├──────────────────────────────────────────────────────────────┤
 │ ONLINE  : Gunakan AuthService (default)                     │
+│           API: https://faye-trimorphic-discretionarily      │
+│                .ngrok-free.dev/api                           │
 │ OFFLINE : Gunakan MockAuthService                           │
 │                                                              │
 │ Untuk switch ke offline mode:                               │
