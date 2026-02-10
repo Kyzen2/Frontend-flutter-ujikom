@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ujikomaplikasi/page/muridview.dart';
 import 'package:ujikomaplikasi/page/guruview.dart';
-import 'package:ujikomaplikasi/service/mock_auth_service.dart';
+import 'package:ujikomaplikasi/service/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -182,7 +182,7 @@ void dispose() {
       }
 
       try {
-        final result = await MockAuthService.login(nis, password);
+        final result = await AuthService.login(nis, password);
 
         if (!mounted) return;
 

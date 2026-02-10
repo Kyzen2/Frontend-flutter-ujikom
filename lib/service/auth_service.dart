@@ -26,6 +26,9 @@ class AuthService {
   static Future<Map<String, dynamic>?> login(String email, String password) async {
     final deviceId = await _getDeviceId();
 
+    print('📝 DEBUG LOGIN: Sending request to $baseUrl/login');
+    print('📦 DEBUG LOGIN: Body: email=$email, device_id=$deviceId');
+
     final response = await http.post(
       Uri.parse('$baseUrl/login'),
       headers: {
@@ -38,7 +41,13 @@ class AuthService {
       },
     );
 
-    if (response.statusCode != 200) return null;
+    print('📡 DEBUG LOGIN: Status Code: ${response.statusCode}');
+    print('📄 DEBUG LOGIN: Response Body: ${response.body}');
+
+    if (response.statusCode != 200) {
+      print('❌ DEBUG LOGIN: Login Failed with status ${response.statusCode}');
+      return null;
+    }
 
     final data = jsonDecode(response.body);
     final prefs = await SharedPreferences.getInstance();
@@ -47,5 +56,11 @@ class AuthService {
     await prefs.setString('role', data['data']['user']['role']);
 
     return data['data']['user'];
+  }
+
+  static Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+    await prefs.remove('role');
   }
 }

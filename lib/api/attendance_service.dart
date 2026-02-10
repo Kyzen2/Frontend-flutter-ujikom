@@ -30,6 +30,7 @@ class AttendanceService {
   Future<Map<String, dynamic>> createSession({int jadwalId = 1}) async {
     try {
       final token = await _getToken();
+      print('DEBUG: AttendanceService.createSession - Token: $token');
 
       final res = await http.post(
         Uri.parse("$baseUrl/attendance/session"),
@@ -42,6 +43,9 @@ class AttendanceService {
           "jadwal_id": jadwalId,
         }),
       );
+
+      print('DEBUG: AttendanceService.createSession - Status: ${res.statusCode}');
+      print('DEBUG: AttendanceService.createSession - Body: ${res.body}');
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         return jsonDecode(res.body);
@@ -93,6 +97,18 @@ class AttendanceService {
   }) async {
     try {
       final token = await _getToken();
+      print('=========================================');
+      print('🚀 DEBUG SCAN: Sending to $baseUrl/attendance/scan');
+      print('🔑 DEBUG SCAN: Token used: ${token ?? 'NULL'}');
+      print('📦 DEBUG SCAN: QR Token: $tokenQr');
+      print('=========================================');
+      
+      if (token == null) {
+        return {
+          'status': 'error',
+          'message': 'Sesi Anda telah berakhir. Silakan login kembali.',
+        };
+      }
 
       final body = {
         "token_qr": tokenQr,
@@ -109,9 +125,14 @@ class AttendanceService {
         headers: {
           "Authorization": "Bearer $token",
           "Accept": "application/json",
+          "Content-Type": "application/json",
         },
-        body: body,
+        body: jsonEncode(body),
       );
+
+      print('📡 DEBUG SCAN: Status Code: ${res.statusCode}');
+      print('📝 DEBUG SCAN: Response Body: ${res.body}');
+      print('=========================================');
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         return jsonDecode(res.body);

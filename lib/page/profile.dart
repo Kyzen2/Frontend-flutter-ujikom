@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ujikomaplikasi/page/login.dart';
+import 'package:ujikomaplikasi/service/auth_service.dart';
 
 class ProfilePage extends StatelessWidget {
   final String name;
@@ -158,12 +159,16 @@ class ProfilePage extends StatelessWidget {
               width: double.infinity,
               height: 50,
               child: ElevatedButton.icon(
-                onPressed: () {
-                  // Show confirmation dialog or direct logout
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
-                  );
+                onPressed: () async {
+                  // Actually clear the token
+                  await AuthService.logout();
+                  if (context.mounted) {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginPage()),
+                      (route) => false,
+                    );
+                  }
                 },
                 icon: const Icon(Icons.logout, color: Colors.red),
                 label: const Text(

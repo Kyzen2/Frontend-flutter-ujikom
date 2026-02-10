@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:ujikomaplikasi/api/attendance_service.dart';
+import 'package:ujikomaplikasi/service/auth_service.dart';
+import 'package:ujikomaplikasi/page/login.dart';
 
 class ScanQrPage extends StatefulWidget {
   const ScanQrPage({super.key});
@@ -62,32 +64,61 @@ class _ScanQrPageState extends State<ScanQrPage> {
           Navigator.pop(context, true); // Return true to indicate success
         }
       } else {
-        // Error feedback
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.error_outline, color: Colors.white),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    res['message'] ?? 'Gagal melakukan absensi',
-                    style: const TextStyle(fontSize: 16),
+        // ERROR DIALOG
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Gagal Absensi'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Server mengembalikan pesan:'),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      res['message'] ?? 'Unknown Error',
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                    ),
                   ),
+                  const SizedBox(height: 12),
+                  const Text('Saran: Coba Logout dan Login kembali di HP lo bro.'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () async {
+                    await AuthService.logout();
+                    if (mounted) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LoginPage()),
+                        (route) => false,
+                      );
+                    }
+                  },
+                  child: const Text('Logout & Login Ulang', style: TextStyle(color: Colors.red)),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      processing = false;
+                      scanned = false;
+                    });
+                  },
+                  child: const Text('Coba Lagi'),
                 ),
               ],
             ),
-            backgroundColor: Colors.red[700],
-            duration: const Duration(seconds: 3),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-
-        // Allow retry
-        setState(() {
-          processing = false;
-          scanned = false;
-        });
+          );
+        }
       }
     } catch (e) {
       if (!mounted) return;
@@ -138,6 +169,7 @@ class _ScanQrPageState extends State<ScanQrPage> {
               for (final barcode in barcodes) {
                 final String? code = barcode.rawValue;
                 if (code != null && code.isNotEmpty) {
+                  debugPrint('📸 DEBUG UI: QR Code detected! Token: $code');
                   sendQR(code);
                   break;
                 }
