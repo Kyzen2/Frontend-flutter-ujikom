@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ujikomaplikasi/page/profile.dart';
-import 'package:ujikomaplikasi/page/qr_pages.dart';
+import 'package:ujikomaplikasi/page/scan_qr_page.dart';
 import 'package:ujikomaplikasi/page/history.dart';
 import 'package:ujikomaplikasi/page/jadwal_murid.dart';
 

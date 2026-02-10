@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ScanQrPage extends StatefulWidget {
-  const ScanQrPage({super.key});
+class ScanQrPageMockup extends StatefulWidget {
+  const ScanQrPageMockup({super.key});
 
   @override
   State<ScanQrPage> createState() => _ScanQrPageState();

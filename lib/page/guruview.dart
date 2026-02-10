@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ujikomaplikasi/page/detail_jadwal.dart';
 import 'package:ujikomaplikasi/page/profile.dart';
 import 'package:ujikomaplikasi/page/history.dart';
 import 'package:ujikomaplikasi/page/jadwal_guru.dart';
+import 'package:ujikomaplikasi/page/guru_generate_qr_page.dart';
 
 class GuruDashboardPage extends StatefulWidget {
   const GuruDashboardPage({super.key});
@@ -14,14 +14,14 @@ class GuruDashboardPage extends StatefulWidget {
 class _GuruDashboardPageState extends State<GuruDashboardPage> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    const GuruDashboardHome(),
-    const HistoryPage(role: 'GURU'),
-    const JadwalGuruPage(),
-    const ProfilePage(
+  final List<Widget> _pages = const [
+    GuruDashboardHome(),
+    HistoryPage(role: 'GURU'),
+    JadwalGuruPage(),
+    ProfilePage(
       name: 'Bapak Guru',
       role: 'GURU',
-      nisOrNip: '1987654321', // Example NIP
+      nisOrNip: '1987654321',
     ),
   ];
 
@@ -42,17 +42,15 @@ class _GuruDashboardPageState extends State<GuruDashboardPage> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
         child: SizedBox(
           height: 60,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildBottomNavItem(Icons.home, 'Home', 0),
-              _buildBottomNavItem(Icons.calendar_today, 'Schedule', 1),
-              _buildBottomNavItem(Icons.today, 'Jadwal', 2),
-              _buildBottomNavItem(Icons.person, 'Profile', 3),
+              _navItem(Icons.home, 'Home', 0),
+              _navItem(Icons.calendar_today, 'Schedule', 1),
+              _navItem(Icons.today, 'Jadwal', 2),
+              _navItem(Icons.person, 'Profile', 3),
             ],
           ),
         ),
@@ -60,22 +58,20 @@ class _GuruDashboardPageState extends State<GuruDashboardPage> {
     );
   }
 
-  Widget _buildBottomNavItem(IconData icon, String label, int index) {
-    bool isActive = _selectedIndex == index;
+  Widget _navItem(IconData icon, String label, int index) {
+    final bool active = _selectedIndex == index;
+
     return InkWell(
       onTap: () => _onItemTapped(index),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: isActive ? Colors.blue : Colors.grey,
-          ),
+          Icon(icon, color: active ? Colors.blue : Colors.grey),
           Text(
             label,
             style: TextStyle(
-              color: isActive ? Colors.blue : Colors.grey,
               fontSize: 10,
+              color: active ? Colors.blue : Colors.grey,
             ),
           ),
         ],
@@ -90,140 +86,75 @@ class GuruDashboardHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTopBar(),
+          _topBar(),
           const SizedBox(height: 30),
-          _buildTimerSection(),
+          _timer(),
           const SizedBox(height: 30),
-          _buildQuickActions(),
+          _quickActions(context),
           const SizedBox(height: 30),
-          _buildAnnouncements(),
+          _announcements(),
           const SizedBox(height: 30),
-          _buildRecentActivity(),
+          _recentActivity(),
         ],
       ),
     );
   }
 
-  // ... (existing code for _buildTopBar, _buildStatsSection, _buildStatCard, _buildQuickActions, _buildActionButton) ...
-
-  Widget _buildTopBar() {
+  Widget _topBar() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
-          children: [
-            const CircleAvatar(
+          children: const [
+            CircleAvatar(
               radius: 25,
-              backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'), // Placeholder
+              backgroundImage: NetworkImage(
+                'https://i.pravatar.cc/150?img=11',
+              ),
             ),
-            const SizedBox(width: 15),
+            SizedBox(width: 15),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  'Selamat Pagi,',
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
+              children: [
+                Text('Selamat Pagi', style: TextStyle(color: Colors.grey)),
                 Text(
                   'Bapak Guru',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
               ],
             ),
           ],
         ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 1,
-                blurRadius: 10,
-              ),
-            ],
-          ),
-          child: const Icon(Icons.notifications_outlined),
-        ),
+        const Icon(Icons.notifications_outlined),
       ],
     );
   }
 
-  Widget _buildTimerSection() {
+  Widget _timer() {
     return Column(
-      children: [
+      children: const [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildTimeBox('09', 'HOURS'),
-            const Padding(
+            _TimeBox(value: '09', label: 'HOURS'),
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 10),
-              child: Text(
-                ':',
-                style: TextStyle(fontSize: 30, color: Colors.grey),
-              ),
+              child: Text(':', style: TextStyle(fontSize: 30)),
             ),
-            _buildTimeBox('41', 'MINUTES'),
+            _TimeBox(value: '41', label: 'MINUTES'),
           ],
         ),
-        const SizedBox(height: 15),
-        const Text(
-          'Monday, October 23rd',
-          style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
-        ),
+        SizedBox(height: 10),
+        Text('Monday, October 23rd', style: TextStyle(color: Colors.grey)),
       ],
     );
   }
 
-  Widget _buildTimeBox(String value, String label) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 2,
-                blurRadius: 10,
-              ),
-            ],
-          ),
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
-            color: Colors.grey,
-            letterSpacing: 1.2,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildQuickActions() {
+  Widget _quickActions(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -234,70 +165,89 @@ class GuruDashboardHome extends StatelessWidget {
         const SizedBox(height: 15),
         Row(
           children: [
-            _buildActionButton(Icons.qr_code_scanner, 'Scan Masuk', Colors.blue),
+            _qrButton(context),
             const SizedBox(width: 15),
-            _buildActionButton(Icons.edit_calendar, 'Input Izin', Colors.orange),
+            _action(Icons.edit_calendar, 'Input Izin', Colors.orange),
             const SizedBox(width: 15),
-            _buildActionButton(Icons.assessment, 'Laporan', Colors.purple),
+            _action(Icons.assessment, 'Laporan', Colors.purple),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildActionButton(IconData icon, String label, Color color) {
+  Widget _qrButton(BuildContext context) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 15),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: color),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const GenerateQrGuruPage(),
             ),
-          ],
+          );
+        },
+        child: _actionBox(
+          icon: Icons.qr_code,
+          label: 'Generate QR',
+          color: Colors.blue,
         ),
       ),
     );
   }
 
-  Widget _buildAnnouncements() {
+  Widget _action(IconData icon, String label, Color color) {
+    return Expanded(
+      child: _actionBox(icon: icon, label: label, color: color),
+    );
+  }
+
+  Widget _actionBox({
+    required IconData icon,
+    required String label,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 15),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _announcements() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Pengumuman Sekolah',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: const Text('View All'),
-            ),
-          ],
+        const Text(
+          'Pengumuman Sekolah',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         const SizedBox(height: 10),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: [
-              _buildAnnouncementCard('Rapat Guru', 'Kamis, 12:00', Colors.blue),
-              const SizedBox(width: 15),
-              _buildAnnouncementCard('Libur Nasional', 'Jumat, 25 Okt', Colors.orange),
-              const SizedBox(width: 15),
-              _buildAnnouncementCard('Ujian Tengah Semester', 'Senin Depan', Colors.red),
+            children: const [
+              _AnnouncementCard('Rapat Guru', 'Kamis 12:00', Colors.blue),
+              SizedBox(width: 15),
+              _AnnouncementCard('Libur Nasional', 'Jumat 25 Okt', Colors.orange),
+              SizedBox(width: 15),
+              _AnnouncementCard('UTS', 'Senin Depan', Colors.red),
             ],
           ),
         ),
@@ -305,128 +255,128 @@ class GuruDashboardHome extends StatelessWidget {
     );
   }
 
-  Widget _buildAnnouncementCard(String title, String subtitle, Color color) {
-    return Container(
-      width: 250,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color, color.withOpacity(0.7)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+  Widget _recentActivity() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        Text(
+          'Aktivitas Terbaru',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+        SizedBox(height: 15),
+        _ActivityItem(
+          icon: Icons.check_circle,
+          title: 'Input Nilai UH',
+          time: '2 jam lalu',
+          color: Colors.green,
+        ),
+        _ActivityItem(
+          icon: Icons.how_to_reg,
+          title: 'Absensi Kelas',
+          time: '4 jam lalu',
+          color: Colors.blue,
+        ),
+      ],
+    );
+  }
+}
+
+class _TimeBox extends StatelessWidget {
+  final String value;
+  final String label;
+
+  const _TimeBox({required this.value, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15),
           ),
-        ],
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue,
+            ),
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(label, style: const TextStyle(fontSize: 10)),
+      ],
+    );
+  }
+}
+
+class _AnnouncementCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final Color color;
+
+  const _AnnouncementCard(this.title, this.subtitle, this.color);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 220,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(15),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.campaign, color: Colors.white, size: 20),
-              ),
-              const Spacer(),
-              const Text(
-                'PENTING',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 15),
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
+          Text(title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              )),
           const SizedBox(height: 5),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-            ),
-          ),
+          Text(subtitle, style: const TextStyle(color: Colors.white70)),
         ],
       ),
     );
   }
+}
 
-  Widget _buildRecentActivity() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Aktivitas Terbaru',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        const SizedBox(height: 15),
-        _buildActivityItem(Icons.check_circle, 'Input Nilai UH1 - Matematika', '2 jam yang lalu', Colors.green),
-        _buildActivityItem(Icons.how_to_reg, 'Absensi X RPL 1', '4 jam yang lalu', Colors.blue),
-        _buildActivityItem(Icons.note_add, 'Upload Materi Bab 3', 'Kemarin', Colors.purple),
-      ],
-    );
-  }
+class _ActivityItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String time;
+  final Color color;
 
-  Widget _buildActivityItem(IconData icon, String title, String time, Color color) {
+  const _ActivityItem({
+    required this.icon,
+    required this.title,
+    required this.time,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 15),
+      margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
+          Icon(icon, color: color),
           const SizedBox(width: 15),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  time,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+              Text(time, style: const TextStyle(color: Colors.grey)),
+            ],
           ),
         ],
       ),

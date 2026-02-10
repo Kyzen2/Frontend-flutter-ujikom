@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ujikomaplikasi/page/detail_jadwal.dart';
+import 'package:ujikomaplikasi/page/guru_generate_qr_page.dart';
 
 class JadwalGuruPage extends StatelessWidget {
   const JadwalGuruPage({super.key});
@@ -123,12 +123,7 @@ class JadwalGuruPage extends StatelessWidget {
            Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => DetailJadwalPage(
-                className: className,
-                subject: subject,
-                time: time,
-                room: room,
-              ),
+              builder: (context) => const GenerateQrGuruPage(),
             ),
           );
         },

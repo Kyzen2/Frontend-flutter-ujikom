@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ujikomaplikasi/page/muridview.dart';
 import 'package:ujikomaplikasi/page/guruview.dart';
+import 'package:ujikomaplikasi/service/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,6 +14,13 @@ class _LoginPageState extends State<LoginPage> {
   final _nisController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+
+  @override
+void dispose() {
+  _nisController.dispose();
+  _passwordController.dispose();
+  super.dispose();
+}
 
   @override
   Widget build(BuildContext context) {
@@ -139,77 +147,109 @@ class _LoginPageState extends State<LoginPage> {
                   ),
 
                   // Forgot Password
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
+                  // Align(
+                  //   alignment: Alignment.centerRight,
+                  //   child: TextButton(
+                  //     onPressed: () {},
+                  //     child: const Text(
+                  //       'Forgot Password?',
+                  //       style: TextStyle(
+                  //         color: Colors.blue,
+                  //         fontWeight: FontWeight.bold,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 20),
 
                   // Login Button
                   SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        String nis = _nisController.text.trim();
-                        String password = _passwordController.text.trim();
+  width: double.infinity,
+  height: 55,
+  child: ElevatedButton(
+    onPressed: () async {
+      final nis = _nisController.text.trim();
+      final password = _passwordController.text.trim();
 
-                        if (nis == '12345' && password == '123') {
-                          // Login as Student
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const DashboardPage()),
-                          );
-                        } else if (nis == 'admin' && password == 'admin') {
-                          // Login as Teacher
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const GuruDashboardPage()),
-                          );
-                        } else {
-                          // Login Failed
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Invalid NIS/Password'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue[700],
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 5,
-                        shadowColor: Colors.blue.withOpacity(0.3),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text(
-                            'Login',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Icon(Icons.login, color: Colors.white, size: 24),
-                        ],
-                      ),
-                    ),
-                  ),
+      if (nis.isEmpty || password.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('NIS dan password wajib diisi'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      try {
+        final result = await AuthService.login(nis, password);
+
+        if (!mounted) return;
+
+        if (result == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Login gagal'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+
+        if (result['role'] == 'siswa') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const DashboardPage()),
+          );
+        } else if (result['role'] == 'guru') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const GuruDashboardPage()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Role tidak dikenali'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Terjadi kesalahan server'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    },
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.blue[700],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      elevation: 5,
+      shadowColor: Colors.blue.withOpacity(0.3),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: const [
+        Text(
+          'Login',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        SizedBox(width: 10),
+        Icon(Icons.login, color: Colors.white, size: 24),
+      ],
+    ),
+  ),
+),
+
 
                   const SizedBox(height: 40),
                   
