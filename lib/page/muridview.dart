@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ujikomaplikasi/page/profile.dart';
 import 'package:ujikomaplikasi/page/qr_pages.dart';
 import 'package:ujikomaplikasi/page/history.dart';
+import 'package:ujikomaplikasi/page/jadwal_murid.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -15,7 +16,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   final List<Widget> _pages = [
     const DashboardHome(),
-    const Center(child: Text('Schedule Page - Coming Soon')),
+    const JadwalMuridPage(),
     const HistoryPage(role: 'SISWA'),
     const ProfilePage(),
   ];

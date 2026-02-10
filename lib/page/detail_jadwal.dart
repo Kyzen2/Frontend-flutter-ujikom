@@ -58,83 +58,85 @@ class DetailJadwalPage extends StatelessWidget {
                   topRight: Radius.circular(30),
                 ),
               ),
-              child: Column(
-                children: [
-                  const Text(
-                    'Scan QR Code',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const Text(
+                      'Scan QR Code',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Minta siswa untuk scan QR code ini',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  const SizedBox(height: 30),
-                  
-                  // QR Code Placeholder
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          blurRadius: 20,
-                          spreadRadius: 5,
-                        ),
-                      ],
-                      border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Minta siswa untuk scan QR code ini',
+                      style: TextStyle(color: Colors.grey),
                     ),
-                    child: const Icon(
-                      Icons.qr_code_2,
-                      size: 200,
-                      color: Colors.black,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 30),
-                  
-                  // Status
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.green[50],
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.green.withOpacity(0.3)),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.circle, size: 12, color: Colors.green),
-                        SizedBox(width: 8),
-                        Text(
-                          'Kelas Berlangsung',
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
+                    const SizedBox(height: 30),
+                    
+                    // QR Code Placeholder
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            blurRadius: 20,
+                            spreadRadius: 5,
                           ),
-                        ),
+                        ],
+                        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                      ),
+                      child: const Icon(
+                        Icons.qr_code_2,
+                        size: 200,
+                        color: Colors.black,
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 30),
+                    
+                    // Status
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.green[50],
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.green.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(Icons.circle, size: 12, color: Colors.green),
+                          SizedBox(width: 8),
+                          Text(
+                            'Kelas Berlangsung',
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 20),
+                    
+                    // Details Grid
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildDetailItem(Icons.access_time, 'Waktu', time),
+                        _buildDetailItem(Icons.location_on, 'Ruangan', room),
+                        _buildDetailItem(Icons.people, 'Siswa', '32'),
                       ],
                     ),
-                  ),
-                  
-                  const Spacer(),
-                  
-                  // Details Grid
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildDetailItem(Icons.access_time, 'Waktu', time),
-                      _buildDetailItem(Icons.location_on, 'Ruangan', room),
-                      _buildDetailItem(Icons.people, 'Siswa', '32'),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

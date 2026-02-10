@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ujikomaplikasi/page/detail_jadwal.dart';
 import 'package:ujikomaplikasi/page/profile.dart';
 import 'package:ujikomaplikasi/page/history.dart';
+import 'package:ujikomaplikasi/page/jadwal_guru.dart';
 
 class GuruDashboardPage extends StatefulWidget {
   const GuruDashboardPage({super.key});
@@ -16,7 +17,7 @@ class _GuruDashboardPageState extends State<GuruDashboardPage> {
   final List<Widget> _pages = [
     const GuruDashboardHome(),
     const HistoryPage(role: 'GURU'),
-    const Center(child: Text('Data Siswa - Coming Soon')),
+    const JadwalGuruPage(),
     const ProfilePage(
       name: 'Bapak Guru',
       role: 'GURU',
@@ -50,7 +51,7 @@ class _GuruDashboardPageState extends State<GuruDashboardPage> {
             children: [
               _buildBottomNavItem(Icons.home, 'Home', 0),
               _buildBottomNavItem(Icons.calendar_today, 'Schedule', 1),
-              _buildBottomNavItem(Icons.people, 'Students', 2),
+              _buildBottomNavItem(Icons.today, 'Jadwal', 2),
               _buildBottomNavItem(Icons.person, 'Profile', 3),
             ],
           ),
@@ -95,32 +96,19 @@ class GuruDashboardHome extends StatelessWidget {
         children: [
           _buildTopBar(),
           const SizedBox(height: 30),
-          _buildStatsSection(),
+          _buildTimerSection(),
           const SizedBox(height: 30),
           _buildQuickActions(),
           const SizedBox(height: 30),
-          _buildTodayScheduleHeader(),
-          const SizedBox(height: 15),
-          _buildScheduleItem(
-            context: context,
-            time: '08:00 AM',
-            className: 'X RPL 1',
-            subject: 'Web Programming',
-            room: 'Lab 01',
-            color: Colors.blue[50]!,
-          ),
-          _buildScheduleItem(
-            context: context,
-            time: '10:00 AM',
-            className: 'XI TKJ 2',
-            subject: 'Network Administration',
-            room: 'Lab 03',
-            color: Colors.orange[50]!,
-          ),
+          _buildAnnouncements(),
+          const SizedBox(height: 30),
+          _buildRecentActivity(),
         ],
       ),
     );
   }
+
+  // ... (existing code for _buildTopBar, _buildStatsSection, _buildStatCard, _buildQuickActions, _buildActionButton) ...
 
   Widget _buildTopBar() {
     return Row(
@@ -170,52 +158,68 @@ class GuruDashboardHome extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsSection() {
-    return Row(
+  Widget _buildTimerSection() {
+    return Column(
       children: [
-        Expanded(
-          child: _buildStatCard('Total Siswa', '324', Colors.blue),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildTimeBox('09', 'HOURS'),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: Text(
+                ':',
+                style: TextStyle(fontSize: 30, color: Colors.grey),
+              ),
+            ),
+            _buildTimeBox('41', 'MINUTES'),
+          ],
         ),
-        const SizedBox(width: 15),
-        Expanded(
-          child: _buildStatCard('Hadir Hari Ini', '310', Colors.green),
+        const SizedBox(height: 15),
+        const Text(
+          'Monday, October 23rd',
+          style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
         ),
       ],
     );
   }
 
-  Widget _buildStatCard(String title, String count, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.05),
-            spreadRadius: 2,
-            blurRadius: 10,
+  Widget _buildTimeBox(String value, String label) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 2,
+                blurRadius: 10,
+              ),
+            ],
           ),
-        ],
-        border: Border(left: BorderSide(color: color, width: 4)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(color: Colors.grey[600], fontSize: 12),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            count,
+          child: Text(
+            value,
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 32,
               fontWeight: FontWeight.bold,
+              color: Colors.blue,
             ),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+            letterSpacing: 1.2,
+          ),
+        ),
+      ],
     );
   }
 
@@ -267,98 +271,164 @@ class GuruDashboardHome extends StatelessWidget {
     );
   }
 
-  Widget _buildTodayScheduleHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildAnnouncements() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Jadwal Hari Ini',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Pengumuman Sekolah',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            TextButton(
+              onPressed: () {},
+              child: const Text('View All'),
+            ),
+          ],
         ),
-        TextButton(
-          onPressed: () {},
-          child: const Text('View All'),
+        const SizedBox(height: 10),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildAnnouncementCard('Rapat Guru', 'Kamis, 12:00', Colors.blue),
+              const SizedBox(width: 15),
+              _buildAnnouncementCard('Libur Nasional', 'Jumat, 25 Okt', Colors.orange),
+              const SizedBox(width: 15),
+              _buildAnnouncementCard('Ujian Tengah Semester', 'Senin Depan', Colors.red),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildScheduleItem({
-    required BuildContext context,
-    required String time,
-    required String className,
-    required String subject,
-    required String room,
-    required Color color,
-  }) {
+  Widget _buildAnnouncementCard(String title, String subtitle, Color color) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 15),
+      width: 250,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          colors: [color, color.withOpacity(0.7)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context, // Access context from the widget tree since it's inside a StatelessWidget's build method or pass it
-            MaterialPageRoute(
-              builder: (context) => DetailJadwalPage(
-                className: className,
-                subject: subject,
-                time: time,
-                room: room,
-              ),
-            ),
-          );
-        },
-        borderRadius: BorderRadius.circular(15),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white.withOpacity(0.2),
+                  shape: BoxShape.circle,
                 ),
-                child: Text(
-                  time,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                    color: Colors.black87,
-                  ),
+                child: const Icon(Icons.campaign, color: Colors.white, size: 20),
+              ),
+              const Spacer(),
+              const Text(
+                'PENTING',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 15),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      className,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      '$subject • $room',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right, color: Colors.grey[400]),
             ],
           ),
+          const SizedBox(height: 15),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            subtitle,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecentActivity() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Aktivitas Terbaru',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
+        const SizedBox(height: 15),
+        _buildActivityItem(Icons.check_circle, 'Input Nilai UH1 - Matematika', '2 jam yang lalu', Colors.green),
+        _buildActivityItem(Icons.how_to_reg, 'Absensi X RPL 1', '4 jam yang lalu', Colors.blue),
+        _buildActivityItem(Icons.note_add, 'Upload Materi Bab 3', 'Kemarin', Colors.purple),
+      ],
+    );
+  }
+
+  Widget _buildActivityItem(IconData icon, String title, String time, Color color) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  time,
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
