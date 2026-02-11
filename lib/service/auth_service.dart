@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'dart:io' show Platform; // Only for non-web
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -9,6 +10,11 @@ class AuthService {
 
   static Future<String> _getDeviceId() async {
     final deviceInfo = DeviceInfoPlugin();
+
+    if (kIsWeb) {
+      final web = await deviceInfo.webBrowserInfo;
+      return web.userAgent ?? 'web-browser';
+    }
 
     if (Platform.isAndroid) {
       final android = await deviceInfo.androidInfo;

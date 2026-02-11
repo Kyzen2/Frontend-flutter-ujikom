@@ -215,10 +215,11 @@ void dispose() {
           );
         }
       } catch (e) {
+        print('❌ ERROR LOGIN: $e');
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Terjadi kesalahan server'),
+          SnackBar(
+            content: Text('Terjadi kesalahan: $e'),
             backgroundColor: Colors.red,
           ),
         );
